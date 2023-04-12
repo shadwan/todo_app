@@ -1,30 +1,31 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:todo_app/2_application/pages/home/home_page.dart';
 
-import '../2_application/pages/dashboard/dashboard_page.dart';
-import '../2_application/pages/home/home_page.dart';
-import '../2_application/pages/overview/overview_page.dart';
-import '../2_application/pages/settings/settings_page.dart';
+import 'go_router_observer.dart';
+
+final GlobalKey<NavigatorState> _rootNavigatorKey =
+    GlobalKey<NavigatorState>(debugLabel: 'root');
+final GlobalKey<NavigatorState> _shellNavigatorKey =
+    GlobalKey<NavigatorState>(debugLabel: 'shell');
 
 final routes = GoRouter(
-  initialLocation: '/overview',
+  navigatorKey: _rootNavigatorKey,
+  observers: [GoRouterObserver()],
+  initialLocation: '/home/dashboard',
   routes: [
     ShellRoute(
-      builder: (context, state, child) => HomePage(child: child),
-      routes: [
-        GoRoute(
-          path: '/overview',
-          builder: (context, state) => const OverviewPage(),
-        ),
-        GoRoute(
-          path: '/dashboard',
-          builder: (context, state) => const DashboardPage(),
-        ),
-        GoRoute(
-          path: '/settings',
-          builder: (context, state) => const SettingsPage(),
-        ),
-      ],
-    ),
+        navigatorKey: _shellNavigatorKey,
+        builder: (context, state, child) => child,
+        routes: [
+          GoRoute(
+            path: '/home/:tab',
+            builder: (context, state) => HomePage(
+              key: state.pageKey,
+              tab: state.params['tab']!,
+            ),
+          )
+        ]),
   ],
   debugLogDiagnostics: true,
 );
